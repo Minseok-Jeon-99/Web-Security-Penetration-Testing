@@ -1,0 +1,115 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs (실제 로그 파일은 제외, 예시만 포함)
+logs/*.log
+!logs/.gitkeep
+
+# Reports (민감한 보고서는 제외)
+reports/full_scan_*/
+reports/*.pdf
+
+# Screenshots (실제 스크린샷은 제외, 예시만 포함)
+screenshots/*.png
+screenshots/*.jpg
+!screenshots/example_*.png
+
+# 민감한 정보
+*.env
+.env.*
+secrets.json
+credentials.json
+config_private.py
+
+# 테스트 중 생성된 임시 파일
+*.tmp
+*.temp
+temp_*
+test_output_*
+
+# JWT 토큰 등 민감한 데이터
+*token*.txt
+*password*.txt
+*secret*.txt
+
+# 브라우저 자동화 관련
+*.crx
+chromedriver
+geckodriver
+selenium-*.jar
+
+# 압축 파일 (배포용 제외)
+*.zip
+*.tar.gz
+*.rar
+!release_*.zip
+
+# OS 관련
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# 백업 파일
+*.bak
+*.backup
+*~
+
+# 데이터베이스 덤프 (테스트 중 생성)
+*.sql
+*.db
+*.sqlite
+*.sqlite3
+
+# 개인 메모 (공개하지 않을 파일)
+PRIVATE_NOTES.md
+TODO_PERSONAL.md
+ANONYMIZATION_SUMMARY.md
+scratch_*.py
+
+# Burp Suite, ZAP 등 도구 출력
+burp_*.log
+zap_*.log
+*.burp
+*.zap
+
+# 익명화 백업 (Git에 올리지 않음)
+backup_original_*/
+anonymize*.sh

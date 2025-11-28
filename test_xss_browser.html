@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSS 취약점 테스트</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .test-section {
+            background: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-header {
+            color: #4ec9b0;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .payload {
+            background: #1e1e1e;
+            border: 1px solid #007acc;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #ce9178;
+        }
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+        .safe {
+            background: #0e4429;
+            border: 1px solid #238636;
+            color: #7ee787;
+        }
+        .vulnerable {
+            background: #3c1c1c;
+            border: 1px solid #f85149;
+            color: #ff7b72;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        #test-output {
+            background: #1e1e1e;
+            border: 1px solid #3c3c3c;
+            padding: 15px;
+            margin-top: 20px;
+            min-height: 100px;
+            border-radius: 5px;
+        }
+        .console-log {
+            color: #4ec9b0;
+            margin: 5px 0;
+        }
+        .console-warn {
+            color: #dcdcaa;
+            margin: 5px 0;
+        }
+        .console-error {
+            color: #f48771;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔒 XSS 취약점 테스트 도구</h1>
+    <p>이 페이지는 다양한 XSS 페이로드를 안전하게 테스트할 수 있는 환경입니다.</p>
+
+    <!-- Test 1: innerHTML with script tag -->
+    <div class="test-section">
+        <div class="test-header">테스트 1: innerHTML + &lt;script&gt; 태그</div>
+        <div class="payload">&lt;script&gt;alert('XSS')&lt;/script&gt;</div>
+        <button onclick="test1()">실행</button>
+        <div id="result1"></div>
+        <div id="output1"></div>
+    </div>
+
+    <!-- Test 2: innerHTML with event handler -->
+    <div class="test-section">
+        <div class="test-header">테스트 2: innerHTML + 이벤트 핸들러</div>
+        <div class="payload">&lt;img src=x onerror=alert('XSS')&gt;</div>
+        <button onclick="test2()">실행</button>
+        <div id="result2"></div>
+        <div id="output2"></div>
+    </div>
+
+    <!-- Test 3: textContent (safe) -->
+    <div class="test-section">
+        <div class="test-header">테스트 3: textContent (안전)</div>
+        <div class="payload">&lt;img src=x onerror=alert('XSS')&gt;</div>
+        <button onclick="test3()">실행</button>
+        <div id="result3"></div>
+        <div id="output3"></div>
+    </div>
+
+    <!-- Test 4: DOMPurify -->
+    <div class="test-section">
+        <div class="test-header">테스트 4: DOMPurify 정화</div>
+        <div class="payload">&lt;img src=x onerror=alert('XSS')&gt;&lt;b&gt;Bold Text&lt;/b&gt;</div>
+        <button onclick="test4()">실행</button>
+        <div id="result4"></div>
+        <div id="output4"></div>
+    </div>
+
+    <!-- Test 5: TargetApp API 시뮬레이션 -->
+    <div class="test-section">
+        <div class="test-header">테스트 5: 대상 서비스 API 응답 시뮬레이션</div>
+        <p>실제 API 응답처럼 XSS 페이로드를 처리하는 다양한 방법을 테스트합니다.</p>
+        <button onclick="test5_unsafe()">❌ 위험한 방법 (innerHTML)</button>
+        <button onclick="test5_safe()">✅ 안전한 방법 (textContent)</button>
+        <div id="result5"></div>
+        <div id="output5"></div>
+    </div>
+
+    <!-- Console Output -->
+    <div class="test-section">
+        <div class="test-header">📋 콘솔 출력</div>
+        <div id="test-output"></div>
+        <button onclick="clearConsole()">Clear</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    <script>
+        // Custom console for display
+        const customConsole = {
+            log: function(...args) {
+                const msg = args.join(' ');
+                document.getElementById('test-output').innerHTML +=
+                    `<div class="console-log">✓ ${msg}</div>`;
+                console.log(...args);
+            },
+            warn: function(...args) {
+                const msg = args.join(' ');
+                document.getElementById('test-output').innerHTML +=
+                    `<div class="console-warn">⚠ ${msg}</div>`;
+                console.warn(...args);
+            },
+            error: function(...args) {
+                const msg = args.join(' ');
+                document.getElementById('test-output').innerHTML +=
+                    `<div class="console-error">✗ ${msg}</div>`;
+                console.error(...args);
+            }
+        };
+
+        function clearConsole() {
+            document.getElementById('test-output').innerHTML = '';
+        }
+
+        // Test 1: innerHTML with script tag
+        function test1() {
+            const output = document.getElementById('output1');
+            const result = document.getElementById('result1');
+
+            output.innerHTML = '';
+
+            try {
+                const payload = "<script>alert('XSS from Test1')<\/script>";
+                output.innerHTML = payload;
+
+                customConsole.log('Test 1: script 태그 삽입 완료');
+                customConsole.log('innerHTML에 script 태그는 실행되지 않음!');
+                result.innerHTML = '<div class="result safe">✓ 안전 - script 태그는 innerHTML로 삽입 시 실행 안 됨</div>';
+            } catch(e) {
+                customConsole.error('Test 1 Error:', e.message);
+                result.innerHTML = '<div class="result safe">✓ 에러 발생으로 안전</div>';
+            }
+        }
+
+        // Test 2: innerHTML with event handler
+        function test2() {
+            const output = document.getElementById('output2');
+            const result = document.getElementById('result2');
+
+            output.innerHTML = '';
+
+            // Alert 대신 console.log 사용 (테스트 편의)
+            const payload = "<img src=x onerror=\"customConsole.warn('XSS 실행됨! 취약합니다.')\">";
+            output.innerHTML = payload;
+
+            customConsole.log('Test 2: 이벤트 핸들러 삽입 완료');
+            result.innerHTML = '<div class="result vulnerable">⚠ 취약 - 이벤트 핸들러가 실행됨!</div>';
+        }
+
+        // Test 3: textContent (safe)
+        function test3() {
+            const output = document.getElementById('output3');
+            const result = document.getElementById('result3');
+
+            output.innerHTML = '';
+
+            const payload = "<img src=x onerror=alert('XSS')>";
+            output.textContent = payload;
+
+            customConsole.log('Test 3: textContent 사용');
+            customConsole.log('결과:', output.textContent);
+            result.innerHTML = '<div class="result safe">✓ 안전 - HTML이 텍스트로 표시됨</div>';
+        }
+
+        // Test 4: DOMPurify
+        function test4() {
+            const output = document.getElementById('output4');
+            const result = document.getElementById('result4');
+
+            output.innerHTML = '';
+
+            const dirty = "<img src=x onerror=alert('XSS')><b>Bold Text</b>";
+            const clean = DOMPurify.sanitize(dirty);
+
+            customConsole.log('Test 4: DOMPurify 정화');
+            customConsole.log('원본:', dirty);
+            customConsole.log('정화됨:', clean);
+
+            output.innerHTML = clean;
+            result.innerHTML = '<div class="result safe">✓ 안전 - 악성 코드는 제거되고 안전한 HTML만 유지</div>';
+        }
+
+        // Test 5: TargetApp API simulation
+        function test5_unsafe() {
+            const output = document.getElementById('output5');
+            const result = document.getElementById('result5');
+
+            output.innerHTML = '';
+
+            // 실제 대상 서비스 API 응답 시뮬레이션
+            const apiResponse = {
+                request_data: {
+                    query_string: "<img src=x onerror=\"customConsole.warn('대상 서비스 XSS 취약점 발견!')\">"
+                }
+            };
+
+            // ❌ 위험한 방법
+            output.innerHTML = `검색어: ${apiResponse.request_data.query_string}`;
+
+            customConsole.warn('위험한 방법: innerHTML 사용');
+            result.innerHTML = '<div class="result vulnerable">⚠ 취약 - 프론트엔드에서 innerHTML 사용 시 XSS 발생!</div>';
+        }
+
+        function test5_safe() {
+            const output = document.getElementById('output5');
+            const result = document.getElementById('result5');
+
+            output.innerHTML = '';
+
+            // 실제 대상 서비스 API 응답 시뮬레이션
+            const apiResponse = {
+                request_data: {
+                    query_string: "<img src=x onerror=alert('XSS')>"
+                }
+            };
+
+            // ✅ 안전한 방법
+            const p = document.createElement('p');
+            p.textContent = `검색어: ${apiResponse.request_data.query_string}`;
+            output.appendChild(p);
+
+            customConsole.log('안전한 방법: textContent 사용');
+            customConsole.log('표시된 내용:', p.textContent);
+            result.innerHTML = '<div class="result safe">✓ 안전 - textContent 사용으로 XSS 차단</div>';
+        }
+
+        // 페이지 로드 시 안내
+        window.onload = function() {
+            customConsole.log('=== XSS 테스트 환경 준비 완료 ===');
+            customConsole.log('각 테스트 버튼을 클릭하여 XSS 동작을 확인하세요.');
+            customConsole.log('');
+        };
+    </script>
+</body>
+</html>
