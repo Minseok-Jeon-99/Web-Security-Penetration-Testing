@@ -298,5 +298,5 @@ python3 test04_error_handling.py   # 3-5분
 
 ---
 
-**작성자:** Security Testing Team
+**작성자:** Jesper._.ch
 **최종 수정:** 2025-01-27
