@@ -1086,7 +1086,6 @@ https://www.first.org/cvss/calculator/3.1
 ## 📞 문의
 
 보안 취약점 관련 문의:
-- **Email:** security@example-target.com
 - **Bug Bounty:** (미운영)
 - **책임 있는 공개 정책:** 90일
 

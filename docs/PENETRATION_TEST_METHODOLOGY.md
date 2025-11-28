@@ -1,6 +1,6 @@
 # TargetApp API 보안 침투 테스트 방법론 및 실행 상세 보고서
 
-**작성자:** Security Penetration Testing Team
+**작성자:** Jesper._.ch
 **작성일:** 2025년 11월 28일
 **테스트 기간:** 2025년 11월 27일 ~ 2025년 11월 28일
 **대상 시스템:** https://www.example-target.com (TargetApp Expert Search API)
@@ -1935,7 +1935,7 @@ sessionStorage
 
 **최종 업데이트:** 2025-11-28
 **문서 버전:** 1.0
-**작성자:** Security Penetration Testing Team
+**작성자:** Jesper._.ch
 
 **이 문서의 활용:**
 - 포트폴리오 첨부

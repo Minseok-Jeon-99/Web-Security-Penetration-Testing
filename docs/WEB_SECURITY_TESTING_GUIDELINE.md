@@ -1150,4 +1150,3 @@ nmap -sV example.com
 
 **피드백 및 개선 제안:**
 - GitHub Issues
-- Email: security@example.com
